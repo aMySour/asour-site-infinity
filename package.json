@@ -1,8 +1,8 @@
 {
   "scripts": {
-    "go": "bun run build && python3 -m http.server --directory dist",
-    "build": "rm -rf dist && mkdir dist && cp -r static/. dist/ && bun build ./src/index.ts --outdir dist",
-    "dev": "bun go"
+    "build": "bun run scripts/build.ts",
+    "serve": "bun run scripts/serve.ts",
+    "dev": "bun build && bun serve"
   },
   "dependencies": {
     "@dimforge/rapier2d-compat": "^0.11.2",
