@@ -188,6 +188,10 @@ async function handleHTML(html: string) {
             handleHTML(text);
             continue;
         }
+        // ignore camera
+        if (lowercaseTagName === 'camera') {
+            continue;
+        }
         // if button, log it
         if (lowercaseTagName === 'button') {
             console.log('found button', element);
@@ -199,6 +203,13 @@ async function handleHTML(html: string) {
         element = domOverlayParent.appendChild(element);
         addDOMOverlay(element as HTMLElement, x, y, angle);
     }
+}
+// find camera in domoverlayparent if exists, and if so, set viewport position to it
+let camera = domOverlayParent.querySelector('camera');
+if (camera) {
+    let xy = camera.getAttribute('xy') || '0 0';
+    let [x, y] = xy.split(' ').map(parseFloat);
+    viewport.moveCenter(x, y);
 }
 // clear world
 domOverlayParent.innerHTML = '';
