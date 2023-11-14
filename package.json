@@ -2,7 +2,7 @@
   "scripts": {
     "build": "bun run scripts/build.ts",
     "serve": "bun run scripts/serve.ts",
-    "dev": "bun build && bun serve"
+    "dev": "bun run build && bun run serve"
   },
   "dependencies": {
     "@dimforge/rapier2d-compat": "^0.11.2",
