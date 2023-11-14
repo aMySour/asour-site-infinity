@@ -200,7 +200,7 @@ async function handleHTML(html: string) {
         let xy = element.getAttribute('xy') || '0 0';
         let [x, y] = xy.split(' ').map(parseFloat);
         let angle = parseFloat(element.getAttribute('angle') || '0');
-        element = domOverlayParent.appendChild(element);
+        element = domOverlayParent.appendChild(element.cloneNode(true)) as HTMLElement;
         addDOMOverlay(element as HTMLElement, x, y, angle);
     }
 }
