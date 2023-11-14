@@ -1,0 +1,14 @@
+{
+  "scripts": {
+    "go": "bun run build && python3 -m http.server --directory dist",
+    "build": "rm -rf dist && mkdir dist && cp -r static/. dist/ && bun build ./src/index.ts --outdir dist",
+    "dev": "bun go"
+  },
+  "dependencies": {
+    "@dimforge/rapier2d-compat": "^0.11.2",
+    "@types/three": "^0.158.2",
+    "pixi-viewport": "^5.0.2",
+    "pixi.js": "^7.3.2",
+    "three": "^0.158.0"
+  }
+}
