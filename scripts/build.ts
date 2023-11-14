@@ -46,7 +46,9 @@ const pages = fs.readdirSync(path.join('src', 'pages'));
 for (let page of pages) {
     let content = fs.readFileSync(path.join('src', 'pages', page), 'utf8');
     // everything between <head> and </head>
-    let head = content.match(/<head>([\s\S]*)<\/head>/)[1].trim();
+    let heads = content.match(/<head>([\s\S]*)<\/head>/);
+    if (!heads) throw new Error('No head found in ' + page);
+    let head = heads[1].trim();
     // remove head from content
     content = content.replace(/<head>[\s\S]*<\/head>/, '').trim();
     let pageName = page.split('.')[0];
