@@ -1,8 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/asour-site-infinity/index.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>How</title>
 </head>
 
-<world size="650 450">
+<body>
+    <header>
+        <h1>Infinity Demo</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/page">Page</a>
+        </nav>
+    </header>
+    <world size="650 450">
     <camera xy="500 500"></camera>
     <div class="panel welcome" xy="15 15">
         <h1>How does this work?</h1>
@@ -26,3 +40,11 @@
         font-family: monospace;
     }
 </style>
+    <div id="asides"></div>
+    <div id="loading-cover">
+        <div class="spinner"></div>
+    </div>
+    <script src="/asour-site-infinity/index.js" type="module"></script>
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/asour-site-infinity/index.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embeds</title>
+</head>
+
+<body>
+    <header>
+        <h1>Infinity Demo</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/page">Page</a>
+        </nav>
+    </header>
+    <world size="1000 1000">
+    <camera xy="500 500"></camera>
+    <div class="panel" xy="15 15">
+        <p>Infinity uses real HTML elements! That means we can also use <code>iframe</code>s to embed other
+            websites.</p>
+    </div>
+    <!-- simulo.org iframe-->
+    <iframe src="https://simulo.org" width="800" height="800" xy="15 115"></iframe>
+</world>
+
+<aside>
+    <h1>Embeds</h1>
+    This showcases embedding my web game Simulo in an Infinity page.
+</aside>
+    <div id="asides"></div>
+    <div id="loading-cover">
+        <div class="spinner"></div>
+    </div>
+    <script src="/asour-site-infinity/index.js" type="module"></script>
+</body>
+
+</html>

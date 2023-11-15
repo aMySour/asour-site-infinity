@@ -1,8 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/asour-site-infinity/index.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Infinity Demo</title>
 </head>
 
-<world>
+<body>
+    <header>
+        <h1>Infinity Demo</h1>
+        <nav>
+            <a href="/">Home</a>
+            <a href="/page">Page</a>
+        </nav>
+    </header>
+    <world>
     <div xy="-280 -150" class="panel welcome">
         <h1 style="text-align:center;">Welcome to the Infinity Demo</h1>
         <p>Infinity is a new web framework for a whole new kind of website &mdash; one where instead of scrolling your
@@ -12,10 +26,10 @@
     <div class="panel how-to" xy="-305 100">
         Just tap/click and drag to pan around, and scroll or pinch to zoom in and out.
     </div>
-    <world src="/page" xy="500 0"></world>
-    <world src="/embeds" xy="-1000 400"></world>
-    <world src="/why" xy="-1400 -400"></world>
-    <world src="/how" xy="-500 -800"></world>
+    <world src="/asour-site-infinity/page" xy="500 0"></world>
+    <world src="/asour-site-infinity/embeds" xy="-1000 400"></world>
+    <world src="/asour-site-infinity/why" xy="-1400 -400"></world>
+    <world src="/asour-site-infinity/how" xy="-500 -800"></world>
 </world>
 
 <style>
@@ -45,3 +59,11 @@
         margin-bottom: 0;
     }
 </style>
+    <div id="asides"></div>
+    <div id="loading-cover">
+        <div class="spinner"></div>
+    </div>
+    <script src="/asour-site-infinity/index.js" type="module"></script>
+</body>
+
+</html>

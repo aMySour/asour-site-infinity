@@ -1,24 +1,24 @@
 @font-face {
     font-family: "Urbanist";
-    src: url("/fonts/Urbanist-SemiBold.ttf");
+    src: url("/asour-site-infinity/fonts/Urbanist-SemiBold.ttf");
     font-weight: normal;
 }
 
 @font-face {
     font-family: "Urbanist";
-    src: url("/fonts/Urbanist-Bold.ttf");
+    src: url("/asour-site-infinity/fonts/Urbanist-Bold.ttf");
     font-weight: bold;
 }
 
 @font-face {
     font-family: "Urbanist";
-    src: url("/fonts/Urbanist-ExtraBold.ttf");
+    src: url("/asour-site-infinity/fonts/Urbanist-ExtraBold.ttf");
     font-weight: 800;
 }
 
 @font-face {
     font-family: "Urbanist";
-    src: url("/fonts/Urbanist-Black.ttf");
+    src: url("/asour-site-infinity/fonts/Urbanist-Black.ttf");
     font-weight: 900;
 }
 
