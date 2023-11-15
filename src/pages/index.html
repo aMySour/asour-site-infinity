@@ -3,7 +3,45 @@
 </head>
 
 <world>
-    <p xy="100 10">test</p>
-    <button xy="2 2">Button</button>
-    <world src="/page" />
+    <div xy="-280 -150" class="panel welcome">
+        <h1 style="text-align:center;">Welcome to the Infinity Demo</h1>
+        <p>Infinity is a new web framework for a whole new kind of website &mdash; one where instead of scrolling your
+            viewport up and down on isolated pages, you can pan and zoom around a single, continuous world.</p>
+        <p>Have a look around!</p>
+    </div>
+    <div class="panel how-to" xy="-305 100">
+        Just tap/click and drag to pan around, and scroll or pinch to zoom in and out.
+    </div>
+    <world src="/page" xy="500 0"></world>
+    <world src="/embeds" xy="-1000 400"></world>
+    <world src="/why" xy="-1400 -400"></world>
+    <world src="/how" xy="-500 -800"></world>
 </world>
+
+<style>
+    .panel {
+        background-color: #000000a0;
+        padding: 2rem;
+        pointer-events: none;
+    }
+
+    .welcome {
+        width: 35rem;
+    }
+
+    .welcome * {
+        pointer-events: all;
+    }
+
+    .welcome h1 {
+        margin-bottom: 1.5rem;
+    }
+
+    .welcome p {
+        margin-bottom: 1rem;
+    }
+
+    .welcome p:last-child {
+        margin-bottom: 0;
+    }
+</style>

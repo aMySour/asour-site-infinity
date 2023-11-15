@@ -1,7 +1,36 @@
 <head>
-    <title>Infinity Demo</title>
+    <title>Page</title>
 </head>
 
-<world>
-    <p xy="100 30">hi from /page</p>
+<world size="650 350">
+    <camera xy="300 300"></camera>
+    <div class="page panel" xy="15 15">
+        <p>Welcome to another page!</p>
+        <p>That's right, instead of clicking a link to navigate to another page, you can just pan
+            and zoom
+            around
+            the world to find it.</p>
+        <p>This is a great way to make a site that feels like a real place, with a sense of
+            exploration and
+            discovery. Alternatively, you can use the header links to navigate between pages.</p>
+    </div>
 </world>
+
+<aside>
+    <h1>Page</h1>
+    This example area shows how you can navigate an Infinity site without clicking on links.
+</aside>
+
+<style>
+    .page {
+        width: 28rem;
+    }
+
+    .page p {
+        margin-bottom: 1rem;
+    }
+
+    .page p:last-child {
+        margin-bottom: 0;
+    }
+</style>

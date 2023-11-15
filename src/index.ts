@@ -61,13 +61,6 @@ window.addEventListener('resize', () => {
     threeRenderer.setSize(window.innerWidth, window.innerHeight);
 });
 
-// add a circle
-const circle = new PIXI.Graphics();
-circle.beginFill(0xff0000);
-circle.drawCircle(0, 0, 50);
-circle.endFill();
-viewport.addChild(circle);
-
 // when pointer down on pixi, cursor to grabbing, and when pointer up, cursor to normal again
 viewport.on('pointerdown', () => {
     document.body.style.cursor = 'grabbing';
@@ -113,7 +106,9 @@ function addDOMOverlay(element: HTMLElement, x: number, y: number, rotation: num
     element.style.top = '0';
     element.style.left = '0';
     // pointer events auto so it can be interacted with
-    element.style.pointerEvents = 'auto';
+    if (!element.style.pointerEvents) {
+        element.style.pointerEvents = 'auto';
+    }
     // if allow zoom, add scroll listener to prevent default
     if (allowZoom) {
         element.addEventListener('wheel', (e) => {
@@ -142,6 +137,12 @@ function addTextMarkdown(text: string, x: number, y: number) {
 // this is an experimental new kind of website, where instead of scrolling through isolated pages, its one page you can pan and zoom around.
 // for navigation, theres stil a header which takes your camera places, and theres also some contextual UI, like when youre in the blog area, theres filters, sorting and blog search on your screen
 
+let prevCenter = { x: 0, y: 0 };
+let activeWorld: World | null = null;
+
+let asidesParent = document.querySelector('#asides') as HTMLElement;
+let asides: HTMLElement[] = [];
+
 // in tick, update dom overlays
 app.ticker.add(() => {
     for (let overlay of domOverlays) {
@@ -149,16 +150,131 @@ app.ticker.add(() => {
         let screenPos = viewport.toScreen(overlay.position);
         overlay.element.style.transform = `translate(${screenPos.x}px, ${screenPos.y}px) rotate(${overlay.rotation}rad) scale(${viewport.scale.x})`;
     }
+    // if center changed, update active world
+    let center = viewport.center;
+    if (center.x !== prevCenter.x || center.y !== prevCenter.y) {
+        let prevActiveWorld = activeWorld;
+        activeWorld = getActiveWorld();
+        if (activeWorld) {
+            prevCenter = center;
+            if (!prevActiveWorld || activeWorld.url !== prevActiveWorld.url) {
+                document.title = activeWorld.name;
+                // update url in address bar
+                history.pushState(null, '', activeWorld.url);
+                // remove .show from all asides and then add it to the one that matches the url
+                for (let aside of asides) {
+                    if (aside.dataset.url === activeWorld.url) {
+                        aside.classList.add('show');
+                    }
+                    else {
+                        aside.classList.remove('show');
+                    }
+                }
+            }
+        }
+    }
+
 });
+
+interface World {
+    name: string,
+    url: string,
+    position: { x: number, y: number },
+    inWorld: (x: number, y: number) => boolean,
+}
+
+let worlds: World[] = [];
+
+let mainWorld: World;
+
+function getActiveWorld() {
+    // get center of viewport
+    let center = viewport.center;
+    // check if in any world
+    for (let world of worlds) {
+        if (world.inWorld(center.x, center.y)) {
+            return world;
+        }
+    }
+    // if not, return main world
+    return mainWorld;
+}
+
+import { SmoothGraphics } from '@pixi/graphics-smooth';
 
 // for each element in world, add dom element with data-xy and, if present, data-angle
 // since flow doesnt exist because of the way this is built (and for other reasons) i chose to use `data-xy` instead of css transforms as the way to set positions. since html was where you defined flow, now its where you define pos instead
 // we must first however do this starting from /, not from here since this may be a different page
 const parser = new DOMParser();
-async function handleHTML(html: string) {
+async function handleHTML(url: string, html: string, offsetX: number, offsetY: number, offsetAngle: number) {
     console.log('handling html...');
     let doc = parser.parseFromString(html, 'text/html');
-    let worldElements = doc.querySelector('world')?.children || [];
+    let worldElement = doc.querySelector('world');
+    // if theres an aside element OUTSIDE of world, add it to asidesParent
+    let asideElements = doc.querySelectorAll('aside');
+    for (let asideElement of asideElements) {
+        // make sure its not in world
+        if (asideElement.closest('world')) {
+            continue;
+        }
+        // add to asidesParent
+        let aside = asidesParent.appendChild(asideElement.cloneNode(true)) as HTMLElement;
+        aside.dataset.url = url;
+        asides.push(aside);
+    }
+    // if we have style elements outside of world, add them to head
+    let styleElements = doc.querySelectorAll('style');
+    for (let styleElement of styleElements) {
+        // make sure its not in world
+        if (styleElement.closest('world')) {
+            continue;
+        }
+        // add to head
+        document.head.appendChild(styleElement.cloneNode(true));
+    }
+    if (!worldElement) {
+        console.error('no world element in html');
+        return;
+    }
+
+    // size attribute. if not there, the world is infinite and wont be added to worlds, but instead will be the new main world.
+    let size = worldElement.getAttribute('size');
+    if (size) {
+        let [width, height] = size.split(' ').map(parseFloat);
+        // add to worlds
+        worlds.push({
+            name: doc.title, url,
+            inWorld: (x, y) => {
+                return x >= offsetX && x <= offsetX + width && y >= offsetY && y <= offsetY + height;
+            },
+            position: { x: offsetX + width / 2, y: offsetY + height / 2 },
+        });
+        // draw rectangle outline bounding box
+        let graphics = new SmoothGraphics();
+        graphics.lineStyle(1, 0xffffff, 0.5);
+        graphics.drawRect(offsetX, offsetY, width, height);
+        viewport.addChild(graphics);
+        // text of the name at bottom left
+        let text = new PIXI.Text(doc.title, { fill: 0xffffff, fontFamily: 'Urbanist' });
+        // alpha
+        text.alpha = 0.5;
+        text.resolution = 2;
+
+        // all else is well, lets add it
+        text.x = offsetX;
+        text.y = offsetY + height;
+        viewport.addChild(text);
+    }
+    else {
+        // set as main world
+        mainWorld = {
+            name: doc.title, url,
+            inWorld: () => true,
+            position: { x: 0, y: 0 },
+        };
+    }
+
+    let worldElements = worldElement.children || [];
     console.log('world elements', worldElements);
     for (let element of worldElements) {
         let lowercaseTagName = element.tagName.toLowerCase();
@@ -168,8 +284,9 @@ async function handleHTML(html: string) {
             eval(element.innerHTML);
             continue;
         }
-        // if its style, ignore for now we'll come back to it later
         if (lowercaseTagName === 'style') {
+            // add it to head
+            document.head.appendChild(element.cloneNode(true));
             continue;
         }
         // and now the final special case, which allows us to embed other files of loads of types, like md, html, etc. its our custom tag, world, which uses src (not data-src) to load a file and then replace itself with the contents of that file
@@ -180,12 +297,16 @@ async function handleHTML(html: string) {
                 console.error('world tag without src');
                 continue;
             }
+            let xy = element.getAttribute('xy') || '0 0';
+            let [x, y] = xy.split(' ').map(parseFloat);
+            let angle = parseFloat(element.getAttribute('angle') || '0');
+
             // fetch it
             let res = await fetch(src);
             // get text
             let text = await res.text();
             // recurse
-            handleHTML(text);
+            await handleHTML(src, text, offsetX + x, offsetY + y, offsetAngle + angle);
             continue;
         }
         // ignore camera
@@ -201,7 +322,30 @@ async function handleHTML(html: string) {
         let [x, y] = xy.split(' ').map(parseFloat);
         let angle = parseFloat(element.getAttribute('angle') || '0');
         element = domOverlayParent.appendChild(element.cloneNode(true)) as HTMLElement;
-        addDOMOverlay(element as HTMLElement, x, y, angle);
+        addDOMOverlay(element as HTMLElement, x + offsetX, y + offsetY, angle + offsetAngle);
+
+        // add listeners to links
+        let links = element.querySelectorAll('a');
+        // on use it, if it doesnt start with http, prevent default and instead look in our worlds for it and go to it
+        for (let link of links) {
+            let href = link.getAttribute('href');
+            if (!href) {
+                continue;
+            }
+            if (href.startsWith('http')) {
+                continue;
+            }
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                // go to it
+                let pos = worlds.find((world) => world.url === href)?.position || { x: 0, y: 0 };
+                viewport.snap(pos.x, pos.y, {
+                    time: 500,
+                    removeOnComplete: true,
+                    removeOnInterrupt: true,
+                });
+            });
+        }
     }
 }
 // find camera in domoverlayparent if exists, and if so, set viewport position to it
@@ -214,7 +358,51 @@ if (camera) {
 // clear world
 domOverlayParent.innerHTML = '';
 
-// fetch / and handle it
-fetch('/').then(res => res.text()).then(handleHTML);
-
 domOverlayParent.style.zIndex = '1000';
+
+// remove all asides in our page outside of world
+let documentAsides = document.querySelectorAll('aside');
+for (let aside of documentAsides) {
+    if (aside.closest('world')) {
+        continue;
+    }
+    aside.remove();
+}
+
+// fetch / and handle it
+let res = fetch('/');
+let text = await (await res).text();
+await handleHTML("/", text, 0, 0, 0);
+
+// now its time to remove #loading-cover
+document.querySelector('#loading-cover')?.remove();
+
+// on all header links, also do the link thing
+let headerLinks = document.querySelectorAll('header a');
+for (let link of headerLinks) {
+    let href = link.getAttribute('href');
+    if (!href) {
+        continue;
+    }
+    if (href.startsWith('http')) {
+        continue;
+    }
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        // go to it
+        let pos = worlds.find((world) => world.url === href)?.position || { x: 0, y: 0 };
+        viewport.snap(pos.x, pos.y, {
+            time: 500,
+            removeOnComplete: true,
+            removeOnInterrupt: true,
+        });
+    });
+}
+
+// we're basically done now, party time
+// 🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉🎉
+
+// @ts-ignore
+window.getWorlds = () => worlds;
+// @ts-ignore
+window.getMainWorld = () => mainWorld;
